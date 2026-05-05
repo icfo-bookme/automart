@@ -82,7 +82,7 @@ export default function RootLayout({
       ><AuthProvider>
           <ReduxProvider>
             <Header />
-            <div className="col-span-3 md:hidden flex">
+            <div className="col-span-3 md:hidden flex px-2 pt-1">
               <Search />
             </div>
 
