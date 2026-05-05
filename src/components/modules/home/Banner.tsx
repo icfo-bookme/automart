@@ -60,7 +60,7 @@ export default function HeroCarousel() {
     }, [api])
 
     return (
-        <section className="w-full p-5 relative">
+        <section className="w-full p-2 relative">
             <Carousel
                 opts={{ loop: true, align: "start" }}
                 setApi={setApi}
@@ -114,7 +114,7 @@ export default function HeroCarousel() {
             </Carousel>
 
             {/* DOTS */}
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex gap-3">
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-3">
                 {slides.map((_, index) => (
                     <button
                         key={index}
