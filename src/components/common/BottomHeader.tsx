@@ -146,8 +146,9 @@ const BottomHeader = () => {
           }`}
       >
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3 ">
             <Button
+              className="border border-gray-600"
               variant="ghost"
               size="icon"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

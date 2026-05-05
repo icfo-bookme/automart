@@ -14,6 +14,7 @@ import { ShoppingCart } from "lucide-react";
 import { Toaster } from "sonner";
 import BlogPage from "@/components/modules/home/Blog";
 import { AuthProvider } from "@/context/AuthContext";
+import Search from "@/components/common/Search";
 
 const rubik = Rubik({
   subsets: ["latin"],
@@ -81,6 +82,9 @@ export default function RootLayout({
       ><AuthProvider>
           <ReduxProvider>
             <Header />
+            <div className="col-span-3 md:hidden flex">
+              <Search />
+            </div>
 
             <div className="hidden md:block">
               <BottomHeader />

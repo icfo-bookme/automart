@@ -4,8 +4,6 @@ import ShippingInfo from "@/components/modules/home/DeliverySupportComponent";
 import Products from "@/components/modules/home/ProductShow/Products";
 import { ssrFetch } from "@/lib/ssrFetch";
 import { Category } from "@/types/category";
-import BlogPage from "@/components/modules/home/Blog";
-import VideoModal from "@/components/modules/Products/VideoModal";
 
 export default async function Page() {
   const { data: categories, error } = await ssrFetch<Category[]>("/categories");
@@ -21,9 +19,6 @@ export default async function Page() {
           <div className="hidden lg:block">
             <ShippingInfo />
           </div>
-
-   
-
           <div className="my-8 lg:my-0">
             <Products sectionId={2}  headerTitle="LATEST COLLECTIONS" />
           </div>
@@ -40,8 +35,7 @@ export default async function Page() {
           {/* <Products sectionId={1} headerTitle="TREANDING" />
           <Products sectionId={7} headerTitle="BOOK A SERVICE NOW" />
           <Products sectionId={2} headerTitle="SHOPS" /> */}
-          <InfiniteProductList sort="newest" styleClass="grid-cols-5" />
-       
+          <InfiniteProductList sort="newest" styleClass="grid-cols-5" />       
         </div>
 
       </div>
