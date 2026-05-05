@@ -100,7 +100,7 @@ const Search = () => {
         setShowSuggestions(false);
 
         router.push(
-            `/${slugify(item.name)}/${item.id}`
+            `/item/${slugify(item.name)}/${item.id}`
         );
     };
 
