@@ -113,7 +113,7 @@ export default function SignUpPage() {
         try {
             await register(formData);
         } catch (err: any) {
-            setError(err.message || 'Registration failed. Please try again.');
+            setError('Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }

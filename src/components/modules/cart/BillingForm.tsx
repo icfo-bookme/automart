@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import submitOrder from "@/services/submitOrder";
 import { RootState } from "@/store";
+import { clearCart } from "@/store/cartSlice";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 const BillingForm = () => {
-    
+const dispatch = useDispatch(); 
 const cartItems = useSelector((state: RootState) => state.cart.items);
 const router = useRouter();
   const action = async (prevState: any, formData: FormData) => {
@@ -26,6 +27,7 @@ const router = useRouter();
             toast.success("Thank you for your order.", {
                 description: state.message || "Order submitted successfully!",
             });
+            dispatch(clearCart());
             router.push("/order/success");
 
         } else if (state?.success === false) {
