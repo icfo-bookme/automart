@@ -3,6 +3,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+
 interface User {
     id: number;
     first_name: string;
@@ -27,15 +28,46 @@ interface User {
 interface AuthContextType {
     user: User | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<void>;
+    login: (phone: string, password: string) => Promise<void>;
     register: (userData: any) => Promise<void>;
     logout: () => Promise<void>;
     updateProfile: (userData: any) => Promise<void>;
+    updatePassword: (data: {
+        current_password: string;
+        password: string;
+        password_confirmation: string;
+    }) => Promise<void>;
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE = 'https://mvrezab.com/admin';
+
+const getCookie = (name: string): string => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        return decodeURIComponent(parts.pop()?.split(';').shift() || '');
+    }
+    return '';
+};
+
+
+const getCsrf = async (): Promise<void> => {
+    await fetch(`${API_BASE}/sanctum/csrf-cookie`, {
+        credentials: 'include',
+    });
+};
+
+
+const mutationHeaders = (): HeadersInit => ({
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+    'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
+});
+
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
@@ -43,146 +75,155 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
 
     useEffect(() => {
-        checkUser();
+        (async () => {
+            await checkUser();
+            setLoading(false);
+        })();
     }, []);
 
-    const checkUser = async () => {
+    const checkUser = async (): Promise<void> => {
         try {
-            const token = localStorage.getItem('token');
-            if (token) {
-                const response = await fetch(`${API_URL}/user`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                });
+            const res = await fetch(`${API_BASE}/api/user`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    Accept: 'application/json',
+                },
+            });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    setUser(data.user);
-                } else {
-                    // Token invalid or expired
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                }
+            if (!res.ok) {
+                setUser(null);
+                return;
             }
-        } catch (error) {
-            console.error('Auth check failed:', error);
-        } finally {
-            setLoading(false);
+
+            const data = await res.json();
+            setUser(data?.user ?? null);
+        } catch {
+            setUser(null);
         }
     };
 
-    const login = async (phone: string, password: string) => {
-        const response = await fetch(`${API_URL}/login`, {
+    const login = async (phone: string, password: string): Promise<void> => {
+        await getCsrf();
+
+        const res = await fetch(`${API_BASE}/api/login`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
+            credentials: 'include',
+            headers: mutationHeaders(),
             body: JSON.stringify({ phone, password }),
         });
 
-        const data = await response.json();
+        const data = await res.json();
 
-        if (!response.ok) {
+        if (!res.ok) {
             throw new Error(data.message || 'Login failed');
         }
 
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
+        await checkUser();
         router.push('/dashboard');
     };
 
-    const register = async (userData: any) => {
-        const response = await fetch(`${API_URL}/register`, {
+    const register = async (userData: any): Promise<void> => {
+        await getCsrf();
+
+        const res = await fetch(`${API_BASE}/api/register`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
+            credentials: 'include',
+            headers: mutationHeaders(),
             body: JSON.stringify(userData),
         });
 
-        const data = await response.json();
+        const data = await res.json();
 
-        if (!response.ok) {
-            if (data.errors) {
-                // Handle validation errors
-                const errorMessages = Object.values(data.errors).flat().join(', ');
-                throw new Error(errorMessages);
-            }
-            throw new Error(data.message || 'Registration failed');
+        if (!res.ok) {
+            // Surface validation errors if present
+            const msg =
+                data?.errors
+                    ? Object.values(data.errors as Record<string, string[]>)
+                        .flat()
+                        .join(' ')
+                    : data?.message || 'Registration failed';
+            throw new Error(msg);
         }
 
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
+        await checkUser();
         router.push('/dashboard');
     };
 
-    const logout = async () => {
+    const logout = async (): Promise<void> => {
         try {
-            const token = localStorage.getItem('token');
-            if (token) {
-                await fetch(`${API_URL}/logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                });
-            }
-        } catch (error) {
-            console.error('Logout error:', error);
+            await fetch(`${API_BASE}/api/logout`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    Accept: 'application/json',
+                    'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
+                },
+            });
+        } catch (err) {
+            console.error('Logout error', err);
         } finally {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
             setUser(null);
-            router.push('/');
+            router.push('/signin');
         }
     };
 
-    const updateProfile = async (userData: any) => {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/profile`, {
+
+    const updateProfile = async (userData: any): Promise<void> => {
+        const res = await fetch(`${API_BASE}/api/profile`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
+            credentials: 'include',
+            headers: mutationHeaders(),
             body: JSON.stringify(userData),
         });
 
-        const data = await response.json();
+        const data = await res.json();
 
-        if (!response.ok) {
-            if (data.errors) {
-                const errorMessages = Object.values(data.errors).flat().join(', ');
-                throw new Error(errorMessages);
-            }
-            throw new Error(data.message || 'Update failed');
+        if (!res.ok) {
+            throw new Error(data?.message || 'Update failed');
         }
 
         setUser(data.user);
-        localStorage.setItem('user', JSON.stringify(data.user));
+    };
+
+    const updatePassword = async (data: {
+        current_password: string;
+        password: string;
+        password_confirmation: string;
+    }): Promise<void> => {
+        const res = await fetch(`${API_BASE}/api/change-password`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: mutationHeaders(),
+            body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+            const msg =
+                result?.errors
+                    ? Object.values(result.errors as Record<string, string[]>)
+                        .flat()
+                        .join(' ')
+                    : result?.message || 'Password update failed';
+            throw new Error(msg);
+        }
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile }}>
+        <AuthContext.Provider
+            value={{ user, loading, login, register, logout, updateProfile, updatePassword }}
+        >
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider');
+    if (!context) {
+        throw new Error('useAuth must be used within AuthProvider');
     }
     return context;
 };

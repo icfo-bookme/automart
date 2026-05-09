@@ -4,11 +4,11 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { 
-    User, 
-    Mail, 
-    Phone, 
-    MapPin, 
+import {
+    User,
+    Mail,
+    Phone,
+    MapPin,
     CreditCard,
     LogOut,
     Home,
@@ -113,7 +113,7 @@ export default function DashboardPage() {
                     <div className="px-6 py-4 bg-gray-50 border-b">
                         <h3 className="text-lg font-semibold text-gray-800">Profile Information</h3>
                     </div>
-                    
+
                     <div className="p-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>

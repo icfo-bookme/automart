@@ -9,213 +9,190 @@ import submitOrder from "@/services/submitOrder";
 import { RootState } from "@/store";
 import { clearCart } from "@/store/cartSlice";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
+const bdPhoneRegex = /^(01[3-9]\d{8})$/;
+
 const BillingForm = () => {
-const dispatch = useDispatch(); 
-const cartItems = useSelector((state: RootState) => state.cart.items);
-const router = useRouter();
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const router = useRouter();
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
+
   const action = async (prevState: any, formData: FormData) => {
     return submitOrder(prevState, formData, cartItems);
   };
 
   const [state, formAction, isPending] = useActionState(action, null);
-    useEffect(() => {
-        if (state?.success) {
-            toast.success("Thank you for your order.", {
-                description: state.message || "Order submitted successfully!",
-            });
-            dispatch(clearCart());
-            router.push("/order/success");
 
-        } else if (state?.success === false) {
-            toast.error("Order submission failed", {
-                description: state.message || "Please check the form and try again.",
-            });
-        }
-    }, [state]);
+  const validate = (formData: FormData) => {
+    const errors: Record<string, string> = {};
 
-    return (
-        <div>
-            <form action={formAction}>
-                <FieldGroup>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* First Name */}
-                        <Field>
-                            <FieldLabel htmlFor="firstName">First Name *</FieldLabel>
-                            <Input 
-                                id="firstName" 
-                                name="firstName" 
-                                type="text" 
-                                required 
-                                placeholder="John" 
-                            />
-                            <InputFieldError field="firstName" state={state} />
-                        </Field>
+    const first_name = formData.get("first_name")?.toString() || "";
+    const last_name = formData.get("last_name")?.toString() || "";
+    const phone_number = formData.get("phone_number")?.toString() || "";
+    const email = formData.get("email")?.toString() || "";
 
-                        {/* Last Name */}
-                        <Field>
-                            <FieldLabel htmlFor="lastName">Last Name *</FieldLabel>
-                            <Input 
-                                id="lastName" 
-                                name="lastName" 
-                                type="text" 
-                                required 
-                                placeholder="Doe" 
-                            />
-                            <InputFieldError field="lastName" state={state} />
-                        </Field>
+    if (!first_name.trim()) {
+      errors.first_name = "First name is required";
+    } else if (first_name.length < 2) {
+      errors.first_name = "Minimum 2 characters required";
+    }
 
-                        {/* Phone Number */}
-                        <Field>
-                            <FieldLabel htmlFor="phoneNumber">Phone Number *</FieldLabel>
-                            <Input 
-                                id="phoneNumber" 
-                                name="phoneNumber" 
-                                type="number" 
-                                required 
-                                placeholder="01772660503" 
-                            />
-                            <InputFieldError field="phoneNumber" state={state} />
-                        </Field>
+    if (last_name && last_name.length < 2) {
+      errors.last_name = "Minimum 2 characters required";
+    }
 
-                        {/* Email */}
-                        <Field>
-                            <FieldLabel htmlFor="email">Email</FieldLabel>
-                            <Input 
-                                id="email" 
-                                name="email" 
-                                type="email" 
-                                placeholder="m@example.com" 
-                            />
-                            <InputFieldError field="email" state={state} />
-                        </Field>
+    if (!phone_number.trim()) {
+      errors.phone_number = "Phone number is required";
+    } else if (!bdPhoneRegex.test(phone_number)) {
+      errors.phone_number = "Enter valid BD number (01XXXXXXXXX)";
+    }
 
-                        {/* Country */}
-                        <Field>
-                            <FieldLabel htmlFor="country">Country</FieldLabel>
-                            <Input 
-                                id="country" 
-                                name="country" 
-                                type="text" 
-                                placeholder="Bangladesh" 
-                            />
-                            <InputFieldError field="country" state={state} />
-                        </Field>
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = "Invalid email format";
+    }
 
-                        {/* District */}
-                        <Field>
-                            <FieldLabel htmlFor="district">District</FieldLabel>
-                            <Input 
-                                id="district" 
-                                name="district" 
-                                type="text" 
-                                placeholder="Dhaka" 
-                            />
-                            <InputFieldError field="district" state={state} />
-                        </Field>
+    return errors;
+  };
 
-                        {/* City */}
-                        <Field>
-                            <FieldLabel htmlFor="city">City</FieldLabel>
-                            <Input 
-                                id="city" 
-                                name="city" 
-                                type="text" 
-                                placeholder="Dhaka" 
-                            />
-                            <InputFieldError field="city" state={state} />
-                        </Field>
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const errors = validate(formData);
 
-                        {/* Thana */}
-                        <Field>
-                            <FieldLabel htmlFor="thana">Thana</FieldLabel>
-                            <Input 
-                                id="thana" 
-                                name="thana" 
-                                type="text" 
-                                placeholder="Mohammadpur" 
-                            />
-                            <InputFieldError field="thana" state={state} />
-                        </Field>
+    if (Object.keys(errors).length > 0) {
+      e.preventDefault();
+      setClientErrors(errors);
+      return;
+    }
 
-                        {/* Area */}
-                        <Field>
-                            <FieldLabel htmlFor="area">Area</FieldLabel>
-                            <Input 
-                                id="area" 
-                                name="area" 
-                                type="text" 
-                                placeholder="Dhanmondi" 
-                            />
-                            <InputFieldError field="area" state={state} />
-                        </Field>
+    setClientErrors({});
+  };
 
-                        {/* Road no. */}
-                        <Field>
-                            <FieldLabel htmlFor="roadNo">Road no.</FieldLabel>
-                            <Input 
-                                id="roadNo" 
-                                name="roadNo" 
-                                type="text" 
-                                placeholder="Road 8" 
-                            />
-                            <InputFieldError field="roadNo" state={state} />
-                        </Field>
+  useEffect(() => {
+    if (!state) return;
 
-                        {/* House no. */}
-                        <Field>
-                            <FieldLabel htmlFor="houseNo">House no.</FieldLabel>
-                            <Input 
-                                id="houseNo" 
-                                name="houseNo" 
-                                type="text" 
-                                placeholder="123" 
-                            />
-                            <InputFieldError field="houseNo" state={state} />
-                        </Field>
+    if (state.success) {
+      toast.success("Order placed successfully!");
+      dispatch(clearCart());
+      router.push("/order/success");
+    } else if (state.success === false) {
+      toast.error("Order failed", {
+        description: state.message || "Fix errors and try again",
+      });
+    }
+  }, [state]);
 
-                        {/* Flat no. */}
-                        <Field>
-                            <FieldLabel htmlFor="flatNo">Flat no.</FieldLabel>
-                            <Input 
-                                id="flatNo" 
-                                name="flatNo" 
-                                type="text" 
-                                placeholder="A-5" 
-                            />
-                            <InputFieldError field="flatNo" state={state} />
-                        </Field>
-                    </div>
+  useEffect(() => {
+    const allErrors = {
+      ...state?.errors,
+      ...clientErrors,
+    };
 
-                    {/* Order Notes - Full width */}
-                    <div className="mt-4">
-                        <Field>
-                            <FieldLabel htmlFor="orderNotes">Order Notes</FieldLabel>
-                            <Textarea 
-                                id="orderNotes" 
-                                name="orderNotes" 
-                                placeholder="Any special instructions or notes for your order..."
-                                className="min-h-[100px]"
-                            />
-                            <InputFieldError field="orderNotes" state={state} />
-                        </Field>
-                    </div>
+    const firstError = Object.keys(allErrors || {})[0];
 
-                    {/* Submit Button */}
-                    <FieldGroup className="mt-6">
-                        <Field>
-                            <Button type="submit" disabled={isPending} className="w-full md:w-auto">
-                                {isPending ? "Submitting Order..." : "Place Order"}
-                            </Button>
-                        </Field>
-                    </FieldGroup>
-                </FieldGroup>
-            </form>
+    if (firstError && formRef.current) {
+      const el = formRef.current.querySelector(
+        `[name="${firstError}"]`
+      ) as HTMLElement;
+
+      el?.focus();
+    }
+  }, [clientErrors, state]);
+
+  return (
+    <form ref={formRef} action={formAction} onSubmit={handleSubmit}>
+      <FieldGroup>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <Field>
+            <FieldLabel>First Name *</FieldLabel>
+            <Input name="first_name" />
+            <InputFieldError field="first_name" state={state} />
+          </Field>
+
+          <Field>
+            <FieldLabel>Last Name</FieldLabel>
+            <Input name="last_name" />
+            <InputFieldError field="last_name" state={state} />
+          </Field>
+
+          <Field>
+            <FieldLabel>Phone *</FieldLabel>
+            <Input name="phone_number" />
+            <InputFieldError field="phone_number" state={state} />
+          </Field>
+
+          <Field>
+            <FieldLabel>Email</FieldLabel>
+            <Input name="email" />
+            <InputFieldError field="email" state={state} />
+          </Field>
+
+          <Field>
+            <FieldLabel>Country</FieldLabel>
+            <Input name="country" />
+          </Field>
+
+          <Field>
+            <FieldLabel>District</FieldLabel>
+            <Input name="district" />
+          </Field>
+
+          <Field>
+            <FieldLabel>City</FieldLabel>
+            <Input name="city" />
+          </Field>
+
+          <Field>
+            <FieldLabel>Thana</FieldLabel>
+            <Input name="thana" />
+          </Field>
+
+          <Field>
+            <FieldLabel>Area</FieldLabel>
+            <Input name="area" />
+          </Field>
+
+          <Field>
+            <FieldLabel>Road No</FieldLabel>
+            <Input name="road_no" />
+          </Field>
+
+          <Field>
+            <FieldLabel>Flat No</FieldLabel>
+            <Input name="flat_no" />
+          </Field>
+
+          <Field>
+            <FieldLabel>Car No</FieldLabel>
+            <Input name="car_no" />
+          </Field>
         </div>
-    );
+
+        <div className="mt-4">
+          <Field>
+            <FieldLabel>Order Notes</FieldLabel>
+            <Textarea name="order_notes" />
+          </Field>
+        </div>
+
+        <div className="mt-6">
+          <Button
+            type="submit"
+            disabled={isPending || cartItems.length === 0}
+            className="w-full"
+          >
+            {isPending ? "Processing..." : "Place Order"}
+          </Button>
+        </div>
+      </FieldGroup>
+    </form>
+  );
 };
 
 export default BillingForm;

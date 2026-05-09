@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -14,7 +13,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-import { Heart, ShoppingCart, PhoneCall, ChevronUp, User, LogOut, Settings, Package } from "lucide-react";
+import { Heart, ShoppingCart, PhoneCall, ChevronUp, User, LogOut, Settings, Package, Lock } from "lucide-react";
 import Search from "./Search";
 import Link from "next/link";
 import { RootState } from "@/store";
@@ -87,16 +86,16 @@ export default function Header() {
                   Dashboard
                 </DropdownMenuItem>
               </Link>
-              <Link href="/orders">
+              <Link href="/my-orders">
                 <DropdownMenuItem className="cursor-pointer">
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   My Orders
                 </DropdownMenuItem>
               </Link>
-              <Link href="/settings">
+              <Link href="/change-password">
                 <DropdownMenuItem className="cursor-pointer">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
+                  <Lock className="h-4 w-4 mr-2" />
+                  Change Password
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuSeparator />

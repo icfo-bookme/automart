@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   },
 };
 
+
+
 const page = () => {
     return (
         <div className="container mx-auto min-h-[calc(100vh-100px)]">

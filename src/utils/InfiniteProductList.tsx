@@ -12,6 +12,7 @@ import { calculateDiscount } from "./calculateDiscount";
 import { slugify } from "./slugify";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function InfiniteProductList({
   sort,
@@ -204,10 +205,9 @@ export default function InfiniteProductList({
       {hasMore && (
         <div ref={observerRef} className="h-20 flex justify-center items-center">
           {loading && (
-            <Button disabled size="sm">
-              <Spinner />
-              Loading...
-            </Button>
+            <div className="min-h-screen flex items-center justify-center">
+              <LoadingSpinner />
+            </div>
           )}
         </div>
       )}
