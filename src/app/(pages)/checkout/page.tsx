@@ -9,7 +9,7 @@ const Page = () => {
     const cartItems = useSelector((state: RootState) => state.cart.items);
 
     return (
-        <div className="lg:grid grid-cols-7">
+        <div className="flex flex-col lg:grid lg:grid-cols-7">
             <div className="col-span-5 w-[85%] mx-auto border-r px-4 shadow-md my-5">
                 <div className="pb-5 text-center">
                     <h1 className="text-xl font-semibold mb-2 uppercase bg-gray-950 text-white p-2">Billing Details</h1>
@@ -21,7 +21,7 @@ const Page = () => {
                 
                 <BillingForm />
             </div>
-            <div className="col-span-2 min-h-screen p-4">
+            <div className="col-span-2 lg:min-h-screen p-4 order-first lg:order-last">
                 {cartItems.length === 0 ? (
                     <p className="text-center text-gray-500 mt-10">
                         Your cart is empty
