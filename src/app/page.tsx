@@ -19,7 +19,7 @@ export default async function Page() {
           <div className="hidden lg:block">
             <ShippingInfo />
           </div>
-          <div className="mt-5 lg:my-0">
+          <div className="mt-8 lg:my-0">
             <Products sectionId={2}  headerTitle="LATEST COLLECTIONS" />
           </div>
 
