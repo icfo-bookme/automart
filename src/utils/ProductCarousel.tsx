@@ -155,7 +155,7 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) =>
         </CarouselContent>
 
         <CarouselPrevious className="
-            absolute left-0 lg:-left-12 top-1/2 -translate-y-1/2 z-10
+            absolute -left-4 lg:-left-12 top-[45%] -translate-y-1/2 z-10
             h-11 w-11 rounded-full
             bg-white border-2 border-red-600 text-red-600
             hover:bg-red-600 hover:text-white hover:scale-110 active:scale-95
@@ -165,7 +165,7 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) =>
         </CarouselPrevious>
 
         <CarouselNext className="
-            absolute right-0 lg:-right-12 top-1/2 -translate-y-1/2 z-10
+            absolute -right-5 lg:-right-12 top-[45%] -translate-y-1/2 z-10
             h-11 w-11 rounded-full
             bg-white border-2 border-red-600 text-red-600
             hover:bg-red-600 hover:text-white hover:scale-110 active:scale-95
