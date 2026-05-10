@@ -147,7 +147,7 @@ const BottomNavigation: React.FC = () => {
           <DrawerContent className="h-full max-w-[260px] ml-auto bg-blue-50 text-gray-900 border-l border-gray-200 flex flex-col">
             
             {/* HEADER */}
-            <DrawerHeader className="px-5 pt-6 pb-4 border-b border-gray-200">
+            <DrawerHeader className="px-5 pt-2 pb-2 border-b border-gray-200">
               <DrawerTitle className="text-gray-900 font-semibold">
                 Settings
               </DrawerTitle>
@@ -155,7 +155,7 @@ const BottomNavigation: React.FC = () => {
 
             {/* USER */}
             <div className="mx-4 mt-4 rounded-xl bg-white border border-gray-200 p-4 flex items-center gap-3 shadow-sm">
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+              <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-bold">
                 {user ? user.first_name.charAt(0) : "G"}
               </div>
               <div>
@@ -180,7 +180,7 @@ const BottomNavigation: React.FC = () => {
                     {group.items.map((item) => (
                       <Link key={item.href} href={item.href}>
                         <div className="flex items-center gap-3 px-4 py-3 hover:bg-blue-100 transition">
-                          <span className="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-lg">
+                          <span className="w-8 h-8 flex items-center justify-center bg-red-100 rounded-lg">
                             {item.icon}
                           </span>
 
