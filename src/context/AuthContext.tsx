@@ -42,7 +42,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE = 'https://mvrezab.com/admin';
+const API_BASE = 'http://localhost:8000';
 
 const getCookie = (name: string): string => {
     const value = `; ${document.cookie}`;
@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         await checkUser();
-        router.push('/dashboard');
+        router.push('/');
     };
 
     const register = async (userData: any): Promise<void> => {

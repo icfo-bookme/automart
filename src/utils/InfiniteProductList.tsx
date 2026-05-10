@@ -13,6 +13,7 @@ import { slugify } from "./slugify";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import AddToWishlistButton from "@/components/modules/wishlist/AddToWishlistButton";
 
 export default function InfiniteProductList({
   sort,
@@ -193,7 +194,7 @@ export default function InfiniteProductList({
                     <AddToCartButton product={item} />
                   </div>
 
-                  <Heart className="col-span-1 cursor-pointer h-8 w-8 text-red-600 hover:text-gray-900" />
+                  <AddToWishlistButton product={item} />
                 </div>
               </div>
             </div>

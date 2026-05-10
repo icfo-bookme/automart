@@ -34,11 +34,11 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) =>
   React.useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
-        setSlidesToScroll(2); 
+        setSlidesToScroll(2);
       } else if (window.innerWidth < 1024) {
-        setSlidesToScroll(3); 
+        setSlidesToScroll(3);
       } else {
-        setSlidesToScroll(5); 
+        setSlidesToScroll(5);
       }
     };
     handleResize();
@@ -154,8 +154,25 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) =>
           })}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute left-0 lg:-left-16 top-1/2 -translate-y-1/2 z-10 h-9 w-9 bg-red-600 text-white shadow-md" />
-        <CarouselNext className="absolute right-0 lg:-right-16 top-1/2 -translate-y-1/2 z-10 h-9 w-9 bg-red-600 text-white shadow-md" />
+        <CarouselPrevious className="
+            absolute left-0 lg:-left-12 top-1/2 -translate-y-1/2 z-10
+            h-11 w-11 rounded-full
+            bg-white border-2 border-red-600 text-red-600
+            hover:bg-red-600 hover:text-white hover:scale-110 active:scale-95
+            transition-all duration-200 shadow-sm
+            ">
+          &lt;
+        </CarouselPrevious>
+
+        <CarouselNext className="
+            absolute right-0 lg:-right-12 top-1/2 -translate-y-1/2 z-10
+            h-11 w-11 rounded-full
+            bg-white border-2 border-red-600 text-red-600
+            hover:bg-red-600 hover:text-white hover:scale-110 active:scale-95
+            transition-all duration-200 shadow-sm
+          ">
+          &gt;
+        </CarouselNext>
       </Carousel>
     </div>
   );

@@ -105,9 +105,14 @@ const Search = () => {
 
 
     const handleSuggestionSelect = (item: Item) => {
-        isSelectingRef.current = true;
-        setSearch(item.name);
+        setSearch("");
+        setSuggestions([]);
         setShowSuggestions(false);
+        setActiveIndex(-1);
+
+        router.push(
+            `/item/${slugify(item.name)}/${item.id}`
+        );
     };
 
 
@@ -157,7 +162,7 @@ const Search = () => {
                 >
                     <NativeSelectOption value="">All Categories</NativeSelectOption>
                     {categories?.map((cat) => (
-                        <NativeSelectOption  key={cat.id} value={String(cat.id)}>
+                        <NativeSelectOption key={cat.id} value={String(cat.id)}>
                             {cat.name}
                         </NativeSelectOption>
                     ))}

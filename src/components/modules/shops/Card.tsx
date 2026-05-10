@@ -7,6 +7,7 @@ import { Heart, Star } from "lucide-react";
 import ProductModal from "@/utils/ProductModal";
 import AddToCartButton from "../cart/AddToCartButton";
 import { deslugify } from "@/utils/deslugify";
+import AddToWishlistButton from "../wishlist/AddToWishlistButton";
 
 const Card = ({ products , nam, gridcol = "lg:grid-cols-4 grid-cols-2" }: ProductCarouselProps) => {
     
@@ -93,7 +94,7 @@ const Card = ({ products , nam, gridcol = "lg:grid-cols-4 grid-cols-2" }: Produc
                                         <div className="cursor-pointer w-full col-span-2">
                                             <AddToCartButton product={item} />
                                         </div>
-                                        <Heart className="col-span-1 cursor-pointer h-8 w-8 text-red-600 hover:text-gray-900" />
+                                         <AddToWishlistButton product={item} />
                                         <ProductModal product={item} />
                                     </div>
                                 </div>

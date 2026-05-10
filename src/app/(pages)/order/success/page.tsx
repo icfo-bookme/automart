@@ -33,7 +33,7 @@ export default function OrderSuccessPage() {
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/orders"
+            href="/my-orders"
             className="px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition"
           >
             View My Orders
