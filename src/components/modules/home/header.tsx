@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({
   center = false,
 }) => {
   return (
-    <div className={`mb-8 ${center ? "text-center" : "text-left"}`}>
+    <div className={`mb-3 ${center ? "text-center" : "text-left"}`}>
       <div
         className={`flex items-center gap-4 ${
           center ? "justify-center" : ""
