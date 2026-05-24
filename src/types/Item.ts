@@ -12,6 +12,25 @@ export type SubCategory = {
   updated_at: string;
 };
 
+export interface LatestStock {
+  id: number;
+  item_barcodes_id: number;
+  item_id: number;
+  barcode: string;
+  cost_price: number;
+  quantity: number;
+  uom: string;
+  created_by: string;
+  updated_by: string;
+  soft_delete: number;
+  duplicate_flag: number;
+  cross_flag: number;
+  created_at: string;
+  updated_at: string;
+  isPublic: number;
+  stock_out_display: number;
+}
+
 export type Item = {
   id: number;
   category_id: number;
@@ -48,6 +67,7 @@ export type Item = {
   category: Category;
   yt_video: string | null;
   specifications: Specification[];
+  latest_stock: LatestStock;
 };
 
 

@@ -9,8 +9,6 @@ export default async function Page() {
   const { data: categories, error } = await ssrFetch<Category[]>("/categories");
   const { data: sections, error: sectionError } = await ssrFetch<Category[]>("/sections");
 
-  
-
   return (
     <>
       <div className=" min-h-screen">
@@ -20,7 +18,7 @@ export default async function Page() {
             <ShippingInfo />
           </div>
           <div className="mt-8 lg:my-0">
-            <Products sectionId={2}  headerTitle="LATEST COLLECTIONS" />
+            <Products sectionId={2} headerTitle="LATEST COLLECTIONS" />
           </div>
 
           {
@@ -32,10 +30,8 @@ export default async function Page() {
               ))
             )
           }
-          {/* <Products sectionId={1} headerTitle="TREANDING" />
-          <Products sectionId={7} headerTitle="BOOK A SERVICE NOW" />
-          <Products sectionId={2} headerTitle="SHOPS" /> */}
-          <InfiniteProductList sort="newest" styleClass="grid-cols-5" />       
+          
+          <InfiniteProductList sort="newest" styleClass="grid-cols-5" />
         </div>
 
       </div>

@@ -154,29 +154,28 @@ export default function InfiniteProductList({
 
 
                   <div className="flex items-center gap-2">
-                    {Number(item.sales_price) > 0 ? (
+                    {Number(item.sales_price) > 0 && item.latest_stock.quantity > 0 ? (
                       discount > 0 ? (
                         <>
                           <span className="text-sm line-through text-gray-400">
-                            ৳
-                            {Number(
-                              item.regular_price
-                            ).toLocaleString()}
+                            ৳{Number(item.regular_price).toLocaleString()}
                           </span>
                           <span className="text-lg font-bold text-red-600">
-                            ৳
-                            {Number(item.sales_price).toLocaleString()}
+                            ৳{Number(item.sales_price).toLocaleString()}
                           </span>
                         </>
                       ) : (
                         <span className="text-lg font-bold text-gray-900">
-                          ৳
-                          {Number(item.regular_price).toLocaleString()}
+                          ৳{Number(item.regular_price).toLocaleString()}
                         </span>
                       )
-                    ) : (
-                      <span className="px-3 py-1 text-sm font-bold text-white bg-red-600 rounded">
+                    ) : item.latest_stock.stock_out_display == 1 ? (
+                      <span className="px-3 mb-0.5 py-1 text-sm font-bold text-white bg-red-600 rounded">
                         Call Us for Price
+                      </span>
+                    ) : (
+                      <span className="px-3 mb-0.5 py-1 text-sm font-bold text-white bg-red-600 rounded">
+                        Out of Stock
                       </span>
                     )}
                   </div>

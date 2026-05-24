@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 
 interface User {
@@ -29,6 +30,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (phone: string, password: string) => Promise<void>;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     register: (userData: any) => Promise<void>;
     logout: () => Promise<void>;
     updateProfile: (userData: any) => Promise<void>;
@@ -73,7 +75,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
-
+       
     useEffect(() => {
         (async () => {
             await checkUser();
@@ -91,15 +93,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 },
             });
 
+            const data = await res.json().catch(() => null);
+
+            if (res.status === 401) {
+
+                setUser(null);
+                return;
+            }
+
             if (!res.ok) {
                 setUser(null);
                 return;
             }
 
-            const data = await res.json();
             setUser(data?.user ?? null);
-        } catch {
+        } catch (error) {
             setUser(null);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -213,7 +224,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <AuthContext.Provider
-            value={{ user, loading, login, register, logout, updateProfile, updatePassword }}
+            value={{ user, loading, setLoading, login, register, logout, updateProfile, updatePassword }}
         >
             {children}
         </AuthContext.Provider>

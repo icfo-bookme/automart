@@ -175,7 +175,7 @@ const Search = () => {
                         onKeyDown={handleKeyDown}
                         onFocus={() => suggestions.length && setShowSuggestions(true)}
                         placeholder="Search product..."
-                        className="rounded-none border-l-0 h-12"
+                        className="rounded-none border-l-0 h-12 "
                     />
 
                     {showSuggestions && (
