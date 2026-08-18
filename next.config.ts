@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
  images: {
-    domains: ['automart.com.bd'], 
+    domains: ['admin.automart.com.bd'], 
   },
   reactCompiler: true,
 };
