@@ -99,12 +99,12 @@ export default function HeroCarousel() {
                                         asChild
                                         className="bg-red-600 hover:bg-red-700"
                                     >
-                                        <Link
+                                        {/* <Link
                                             href="/shop"
                                             className="flex items-center gap-1"
                                         >
                                             Shop Now <ChevronsRight size={16} />
-                                        </Link>
+                                        </Link> */}
                                     </Button>
                                 </div>
                             </div>
