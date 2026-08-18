@@ -5,6 +5,10 @@ import Products from "@/components/modules/home/ProductShow/Products";
 import { ssrFetch } from "@/lib/ssrFetch";
 import { Category } from "@/types/category";
 
+// Fetch the homepage data at request time (on the server) instead of at build
+// time, so `next build` never times out waiting on the API.
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const { data: categories, error } = await ssrFetch<Category[]>("/categories");
   const { data: sections, error: sectionError } = await ssrFetch<Category[]>("/sections");

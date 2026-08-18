@@ -19,8 +19,9 @@
 #   SERVER_PASSWORD             -> (your root password)
 #   SERVER_SSH_PORT             -> 22   (SSH port)
 #   APP_PORT                    -> 3000 (port the app runs on)
-#   NEXT_PUBLIC_API_BASE_URL    -> your backend API base url
-#   NEXT_PUBLIC_MAIN_DOMAIN     -> your frontend domain / host
+#
+# NEXT_PUBLIC_* env values come from the committed `.env.local` file, which is
+# bundled into the deploy archive automatically (no extra secrets needed).
 #
 # pm2 process name: automart-frontend
 # =============================================================================
@@ -60,20 +61,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # NEXT_PUBLIC_* values must exist both at build time and at runtime,
-      # so we generate the env file from secrets (it is never committed).
-      - name: Write .env.local from secrets
-        run: |
-          cat > .env.local <<EOF
-          NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
-          NEXT_PUBLIC_MAIN_DOMAIN=${{ secrets.NEXT_PUBLIC_MAIN_DOMAIN }}
-          EOF
-
+      # `.env.local` is committed to the repo and gets bundled into the tar
+      # below, so Next.js picks up the env vars during build and at runtime.
       - name: Build Next.js app
         run: npm run build
-        env:
-          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
-          NEXT_PUBLIC_MAIN_DOMAIN: ${{ secrets.NEXT_PUBLIC_MAIN_DOMAIN }}
 
       # Package everything the server needs (exclude node_modules + .git).
       - name: Package app for deploy

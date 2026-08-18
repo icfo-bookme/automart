@@ -17,11 +17,10 @@ The workflow lives at `.github/workflows/deploy.yml`.
    | `SERVER_PASSWORD` | your server root password |
    | `SERVER_SSH_PORT` | `22` |
    | `APP_PORT` | `3000` |
-   | `NEXT_PUBLIC_API_BASE_URL` | your backend API base URL |
-   | `NEXT_PUBLIC_MAIN_DOMAIN` | your frontend domain / host |
 
-   > ⚠️ Never commit `.env.local` — it is git-ignored. The workflow rebuilds
-   > the env file from the secrets above automatically.
+   > ℹ️ `.env.local` is committed to the repo and used directly by the build,
+   > so no `NEXT_PUBLIC_*` secret is needed. Env বদলাতে হলে শুধু `.env.local`
+   > edit করে push করলেই হবে।
 
 2. **Push to `main`** — the workflow will build and deploy automatically.
    You can also run it manually from the **Actions** tab.
@@ -59,5 +58,3 @@ To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-
