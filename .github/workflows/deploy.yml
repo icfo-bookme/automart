@@ -67,16 +67,19 @@ jobs:
         run: npm run build
 
       # Package everything the server needs (exclude node_modules + .git).
-      # The output tarball itself is excluded so tar does not read it while
-      # writing it ("file changed as we read it").
+      # The archive is written OUTSIDE the workspace ($RUNNER_TEMP) so the
+      # folder being archived never changes while tar reads it. Otherwise tar
+      # fails with "file changed as we read it" (the output file changes the
+      # folder's mtime mid-archive). We then copy it back into the workspace.
       - name: Package app for deploy
         run: |
-          tar -czf automart-deploy.tar.gz \
+          tar -czf "$RUNNER_TEMP/automart-deploy.tar.gz" \
             --exclude='.git' \
             --exclude='node_modules' \
-            --exclude='automart-deploy.tar.gz' \
             --warning=no-file-changed \
             .
+          cp "$RUNNER_TEMP/automart-deploy.tar.gz" ./automart-deploy.tar.gz
+          ls -lh automart-deploy.tar.gz
 
       - name: Upload bundle to server
         uses: appleboy/scp-action@v1.0.0
