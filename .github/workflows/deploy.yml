@@ -36,7 +36,7 @@ on:
 # The PM2 process name and where the app lives on the server.
 env:
   PM2_NAME: automart-frontend
-  DEPLOY_DIR: /root/automart-frontend
+  DEPLOY_DIR: /var/www/automart
 
 jobs:
   build-and-deploy:
