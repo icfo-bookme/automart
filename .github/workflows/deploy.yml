@@ -1,97 +1,46 @@
-# =============================================================================
-# Automart Frontend - Automatic Deploy
-#
-# Triggers:
-#   - On every push to the `main` branch  -> build + deploy automatically
-#   - Manually from the Actions tab       -> via "Run workflow" button
-#
-# What it does:
-#   1. Checks out the code
-#   2. Installs dependencies and builds the Next.js production bundle
-#   3. Packages the app (source + built `.next`) into a tarball
-#   4. Uploads the tarball to the server via SCP (password auth)
-#   5. On the server: extracts, installs prod deps, restarts via PM2
-#      (process name here is `automart-frontend`, running on port 3000)
-#
-# REQUIRED GitHub secrets (Repo -> Settings -> Secrets and variables -> Actions):
-#   SERVER_HOST                 -> 187.52.116.124
-#   SERVER_USERNAME             -> root
-#   SERVER_PASSWORD             -> (your root password)
-#   SERVER_SSH_PORT             -> 22   (SSH port)
-#   APP_PORT                    -> 3000 (port the app runs on)
-#
-# NEXT_PUBLIC_* env values come from the committed `.env.local` file, which is
-# bundled into the deploy archive automatically (no extra secrets needed).
-#
-# pm2 process name: automart-frontend
-# =============================================================================
-name: Deploy Automart Frontend
+# Automart Frontend — Auto-deploy on push to main
+name: Deploy Automart
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
-# The PM2 process name and where the app lives on the server.
-env:
-  PM2_NAME: automart-frontend
-  DEPLOY_DIR: /var/www/automart
-
 jobs:
-  build-and-deploy:
-    name: Build & Deploy
+  deploy:
     runs-on: ubuntu-latest
-
-    # Prevent two deploys from running at the same time.
-    concurrency:
-      group: automart-frontend-deploy
-      cancel-in-progress: false
+    concurrency: automart-deploy
 
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
-      - name: Install dependencies
-        run: npm ci
-
-      # `.env.local` is committed to the repo and gets bundled into the tar
-      # below, so Next.js picks up the env vars during build and at runtime.
-      - name: Build Next.js app
-        run: npm run build
-
-      # Package everything the server needs (exclude node_modules + .git).
-      # The archive is written OUTSIDE the workspace ($RUNNER_TEMP) so the
-      # folder being archived never changes while tar reads it. Otherwise tar
-      # fails with "file changed as we read it" (the output file changes the
-      # folder's mtime mid-archive). We then copy it back into the workspace.
-      - name: Package app for deploy
+      - name: Install & build
         run: |
-          tar -czf "$RUNNER_TEMP/automart-deploy.tar.gz" \
-            --exclude='.git' \
-            --exclude='node_modules' \
-            --warning=no-file-changed \
-            .
-          cp "$RUNNER_TEMP/automart-deploy.tar.gz" ./automart-deploy.tar.gz
-          ls -lh automart-deploy.tar.gz
+          npm ci
+          npm run build
 
-      - name: Upload bundle to server
+      - name: Package
+        run: |
+          tar -czf "$RUNNER_TEMP/automart.tar.gz" \
+            --exclude node_modules --exclude .git \
+            --warning=no-file-changed .
+          cp "$RUNNER_TEMP/automart.tar.gz" .
+
+      - name: Upload to server
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_SSH_PORT }}
-          source: "automart-deploy.tar.gz"
-          target: "/tmp/automart-deploy"
+          source: "automart.tar.gz"
+          target: /tmp
 
-      - name: Release on server (extract, install, pm2 restart)
+      - name: Deploy to /var/www/automart
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -99,43 +48,9 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
-            set -e
-
-            # ---- 1. Make sure Node.js 20+ (+PM2) exist on the server ----
-            if ! command -v node >/dev/null 2>&1 || [ "$(node -v | cut -d. -f1 | sed 's/^v//')" -lt 20 ]; then
-              echo ">> Installing/upgrading Node.js 20..."
-              curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-              apt-get update -y
-              apt-get install -y nodejs
-            fi
-
-            if ! command -v pm2 >/dev/null 2>&1; then
-              echo ">> Installing PM2..."
-              npm install -g pm2
-            fi
-
-            # ---- 2. Extract the new bundle (clean target first) ----
-            APP_DIR="${{ env.DEPLOY_DIR }}"
-            mkdir -p "$APP_DIR"
-            cd "$APP_DIR"
-            rm -rf "$APP_DIR"/.??* "$APP_DIR"/* 2>/dev/null || true
-            tar -xzf /tmp/automart-deploy/automart-deploy.tar.gz -C "$APP_DIR"
-            rm -f /tmp/automart-deploy/automart-deploy.tar.gz
-
-            # ---- 3. Install production dependencies ----
-            npm ci --omit=dev || npm install --omit=dev
-
-            # ---- 4. (Re)start the app with PM2 on the configured port ----
-            export PORT="${{ secrets.APP_PORT }}"
-            pm2 delete "${{ env.PM2_NAME }}" >/dev/null 2>&1 || true
-            pm2 start npm --name "${{ env.PM2_NAME }}" -- start
-            pm2 save --force
-
-            # ---- 5. Quick health check ----
-            sleep 5
-            if curl -fsS -o /dev/null "http://127.0.0.1:${{ secrets.APP_PORT }}"; then
-              echo ">> Deploy OK: app is responding on port ${{ secrets.APP_PORT }}"
-            else
-              echo ">> Warning: app not responding yet on port ${{ secrets.APP_PORT }}. Check 'pm2 logs ${{ env.PM2_NAME }}'"
-            fi
-            pm2 status "${{ env.PM2_NAME }}"
+            cd /var/www/automart
+            rm -rf ./*
+            tar -xzf /tmp/automart.tar.gz
+            rm -f /tmp/automart.tar.gz
+            npm ci --omit=dev
+            pm2 restart automart-frontend --update-env || pm2 start npm --name automart-frontend -- start
