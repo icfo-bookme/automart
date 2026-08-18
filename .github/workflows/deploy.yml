@@ -67,11 +67,15 @@ jobs:
         run: npm run build
 
       # Package everything the server needs (exclude node_modules + .git).
+      # The output tarball itself is excluded so tar does not read it while
+      # writing it ("file changed as we read it").
       - name: Package app for deploy
         run: |
           tar -czf automart-deploy.tar.gz \
             --exclude='.git' \
             --exclude='node_modules' \
+            --exclude='automart-deploy.tar.gz' \
+            --warning=no-file-changed \
             .
 
       - name: Upload bundle to server
