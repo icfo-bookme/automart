@@ -16,6 +16,7 @@ import ProductModal from "./ProductModal";
 import { slugify } from "./slugify";
 import AddToCartButton from "@/components/modules/cart/AddToCartButton";
 import AddToWishlistButton from "@/components/modules/wishlist/AddToWishlistButton";
+import { getYoutubeEmbedUrl } from "./youtube";
 
 interface ProductCarouselProps {
   products: Item[];
@@ -59,6 +60,11 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) =>
         <CarouselContent className="-ml-2 md:-ml-4">
           {products.map((item) => {
             const discount = calculateDiscount(item.regular_price, item.sales_price);
+            const embedUrl = getYoutubeEmbedUrl(item.yt_video, {
+              autoplay: true,
+              mute: true,
+              controls: true,
+            });
 
             return (
               <CarouselItem
@@ -75,11 +81,11 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) =>
 
                   {/* Image / Video */}
                   <div className="relative h-56 p-3">
-                    {item.yt_video ? (
+                    {embedUrl ? (
                       <div className="relative w-full h-56 p-3 rounded-lg overflow-hidden">
                         <iframe
                           className="w-full h-full rounded-lg"
-                          src={`https://www.youtube.com/embed/${item.yt_video.split("v=")[1]}?autoplay=1&mute=1&controls=1`}
+                          src={embedUrl}
                           title="YouTube video"
                           allow="autoplay; encrypted-media"
                           allowFullScreen

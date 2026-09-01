@@ -10,10 +10,17 @@ import { Item } from "@/types/Item";
 import { Eye } from "lucide-react"
 import Image from "next/image";
 import limitWords from "./limitWords";
+import { getYoutubeEmbedUrl } from "./youtube";
 type ProductModalProps = {
     product: Item;
 };
 const ProductModal = ({ product }: ProductModalProps) => {
+
+    const embedUrl = getYoutubeEmbedUrl(product.yt_video, {
+        autoplay: true,
+        mute: false,
+        controls: true,
+    });
 
     return (
         <div>
@@ -31,11 +38,11 @@ const ProductModal = ({ product }: ProductModalProps) => {
 
                         {/* LEFT SIDE - IMAGE */}
                         <div className="relative bg-gray-50 flex items-center justify-center">
-                            {product.yt_video ? (
+                            {embedUrl ? (
                                 <div className="relative w-full h-full p-3 rounded-lg overflow-hidden">
                                     <iframe
                                         className="w-full h-full rounded-lg"
-                                        src={`https://www.youtube.com/embed/${product.yt_video.split("v=")[1]}?autoplay=1&mute=0&controls=1`}
+                                        src={embedUrl}
                                         title="YouTube video"
                                         allow="autoplay; encrypted-media"
                                         allowFullScreen

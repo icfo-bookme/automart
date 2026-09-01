@@ -2,6 +2,8 @@ import AddToCartButton from "@/components/modules/cart/AddToCartButton";
 import RelatedProduct from "@/components/modules/productsDetails/RelatedProduct";
 import { Tab } from "@/components/modules/productsDetails/Tab";
 import AddToWishlistButton from "@/components/modules/wishlist/AddToWishlistButton";
+import YTVideoModal from "@/components/modules/Products/YTVideoModal";
+import { getYoutubeVideoId } from "@/utils/youtube";
 import { ssrFetch } from "@/lib/ssrFetch";
 import { Item } from "@/types/Item";
 import { Metadata } from "next";
@@ -66,16 +68,20 @@ const PageComponents = async ({ params }: PageProps) => {
       <section className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-          {/* Product Image */}
+          {/* Product Image / Video */}
           <div className="relative w-full h-[380px] rounded-xl border bg-white overflow-hidden">
-            <Image
-              src={imageSrc}
-              alt={name || item.name || "Product image"}
-              fill
-              priority
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
+            {item.yt_video && getYoutubeVideoId(item.yt_video) ? (
+              <YTVideoModal videoUrl={item.yt_video} />
+            ) : (
+              <Image
+                src={imageSrc}
+                alt={name || item.name || "Product image"}
+                fill
+                priority
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            )}
           </div>
 
           {/* Product Info */}
