@@ -44,7 +44,23 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE = 'http://localhost:8000';
+// Auth/Sanctum routes (login, register, user, logout, csrf-cookie) live on the API
+// origin itself, NOT under /api/v1. So use a dedicated origin-level env var:
+//   NEXT_PUBLIC_AUTH_BASE_URL=https://api.automart.com.bd   (production)
+// If it's not set, derive the origin from NEXT_PUBLIC_API_BASE_URL
+// (e.g. https://api.automart.com.bd/api/v1 -> https://api.automart.com.bd),
+// and fall back to the local Laravel dev server.
+const getAuthBase = (): string => {
+    const authBase = process.env.NEXT_PUBLIC_AUTH_BASE_URL;
+    if (authBase) return authBase;
+
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (apiBase) return apiBase.replace(/\/api\/v1\/?$/, '');
+
+    return 'https://automart.com.bd';
+};
+
+const API_BASE = getAuthBase();
 
 const getCookie = (name: string): string => {
     const value = `; ${document.cookie}`;
