@@ -6,6 +6,7 @@ import YTVideoModal from "@/components/modules/Products/YTVideoModal";
 import { getYoutubeVideoId } from "@/utils/youtube";
 import { ssrFetch } from "@/lib/ssrFetch";
 import { Item } from "@/types/Item";
+import ViewItemTracker from "@/components/modules/productsDetails/ViewItemTracker";
 import { Metadata } from "next";
 import Image from "next/image";
 
@@ -65,6 +66,8 @@ const PageComponents = async ({ params }: PageProps) => {
 
   return (
     <>
+      {/* Fires GA4 view_item for this product */}
+      <ViewItemTracker item={item} />
       <section className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 

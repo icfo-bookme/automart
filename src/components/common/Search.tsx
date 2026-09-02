@@ -10,6 +10,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { slugify } from "@/utils/slugify";
+import { pushSearch } from "@/datalayer";
 
 const Search = () => {
     const router = useRouter();
@@ -97,6 +98,10 @@ const Search = () => {
             activeIndex >= 0 ? suggestions[activeIndex] : suggestions[0];
 
         setShowSuggestions(false);
+
+        // Fire GA4 search event
+        const term = search.trim() || item.name;
+        if (term) pushSearch(term);
 
         router.push(
             `/item/${slugify(item.name)}/${item.id}`

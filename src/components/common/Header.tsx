@@ -20,6 +20,7 @@ import { RootState } from "@/store";
 import CartSheet from "../modules/cart/CartSheet";
 import BottomHeader from "./BottomHeader";
 import { useAuth } from "@/context/AuthContext";
+import { pushSearch } from "@/datalayer";
 
 
 export default function Header() {
@@ -43,6 +44,8 @@ export default function Header() {
     const params = new URLSearchParams();
     if (categoryId) params.append("category_id", categoryId);
     if (search.trim()) params.append("search", search.trim());
+    // Fire GA4 search event
+    if (search.trim()) pushSearch(search.trim());
     router.push(`/items/search?${params.toString()}`);
   };
 

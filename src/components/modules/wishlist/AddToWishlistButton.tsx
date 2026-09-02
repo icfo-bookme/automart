@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { RootState } from "@/store";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
+import { pushAddToWishlist } from "@/datalayer";
 
 type Props = {
   product: Item;
@@ -34,6 +35,8 @@ const AddToWishlistButton = ({ product }: Props) => {
           thumbnail: product.thumbnail,
         })
       );
+      // Fire GA4 add_to_wishlist event to the data layer
+      pushAddToWishlist(product);
       toast.success("Item added to wishlist!", {
         style: {
           background: "#16a34a",

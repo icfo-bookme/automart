@@ -5,6 +5,7 @@ import { addToCart } from "@/store/cartSlice";
 import { Item } from "@/types/Item";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { pushAddToCart } from "@/datalayer";
 
 type Props = { product: Item };
 
@@ -22,6 +23,9 @@ const AddToCartButton = ({ product }: Props) => {
         thumbnail: product.thumbnail,
       })
     );
+
+    // Fire GA4 add_to_cart event to the data layer
+    pushAddToCart(product, 1);
 
     toast.success(`"${product.name}" has been successfully added to your cart.`);
   };

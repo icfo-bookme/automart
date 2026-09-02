@@ -9,6 +9,7 @@ import BottomNavigation from "@/components/common/BottomNavigation";
 
 import ReduxProvider from "@/providers/ReduxProvider";
 import FloatingButton from "@/components/modules/cart/FloatingButton";
+import PageViewTracker from "@/components/common/PageViewTracker";
 
 import { ShoppingCart } from "lucide-react";
 import { Toaster } from "sonner";
@@ -93,6 +94,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <body
         className={`antialiased ${rubik.variable} font-sans bg-[#F8F8F8]`}
       >
+        <PageViewTracker />
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import AddToWishlistButton from "@/components/modules/wishlist/AddToWishlistButton";
+import { pushSelectItem, pushViewItemList } from "@/datalayer";
 
 export default function InfiniteProductList({
   sort,
@@ -72,6 +73,9 @@ export default function InfiniteProductList({
           const filtered = newItems.filter((i) => !ids.has(i.id));
           return [...prev, ...filtered];
         });
+
+        // Fire GA4 view_item_list for the newly loaded page
+        pushViewItemList(newItems, { listName: title || "All Product" });
 
         setPage((prev) => prev + 1);
       }
@@ -136,7 +140,15 @@ export default function InfiniteProductList({
 
               {/* Content */}
               <div className="p-3 flex flex-col flex-grow border-t">
-                <Link href={`/item/${slugify(item.name)}/${item.id}`}>
+                <Link
+                  href={`/item/${slugify(item.name)}/${item.id}`}
+                  onClick={() =>
+                    pushSelectItem(item, {
+                      listName: title || "All Product",
+                      index,
+                    })
+                  }
+                >
                   <p className="text-xs font-semibold text-gray-700 uppercase truncate">
                     {item.sub_category?.name || "Category"}
                   </p>

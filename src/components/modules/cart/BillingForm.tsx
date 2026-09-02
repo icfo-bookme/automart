@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
+import { pushPurchase } from "@/datalayer";
 
 const bdPhoneRegex = /^(01[3-9]\d{8})$/;
 
@@ -77,6 +78,24 @@ const BillingForm = () => {
     if (!state) return;
 
     if (state.success) {
+      // Fire GA4 purchase (conversion) event with the created order
+      const orderData = state.data as Record<string, any> | null;
+      const total = Number(
+        orderData?.total ??
+          cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+      );
+      pushPurchase(
+        {
+          order_code:
+            orderData?.order_code ??
+            orderData?.id?.toString() ??
+            `AM-${Date.now()}`,
+          total,
+          order_details: orderData?.order_details,
+        },
+        { items: cartItems }
+      );
+
       toast.success("Order placed successfully!");
       dispatch(clearCart());
       router.push("/order/success");

@@ -8,6 +8,7 @@ import { Trash2, Plus, Minus } from "lucide-react";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
+import { pushRemoveFromCart } from "@/datalayer";
 
 type Props = { item: CartItem };
 
@@ -19,11 +20,13 @@ export default function CartItemRow({ item }: Props) {
     const handleDecrease = () => {
         if (item.quantity > 1) {
             dispatch(decreaseQty(item.id));
+            pushRemoveFromCart(item, 1);
         }
     };
     
     const handleRemove = () => {
         setIsRemoving(true);
+        pushRemoveFromCart(item, item.quantity);
         // Add slight delay for smooth animation
         setTimeout(() => dispatch(removeFromCart(item.id)), 300);
     };

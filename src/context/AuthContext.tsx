@@ -3,6 +3,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { pushLogin, pushLogout, pushSignUp } from '@/datalayer';
 
 
 interface User {
@@ -146,6 +147,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             throw new Error(data.message || 'Login failed');
         }
 
+        // Fire GA4 login event
+        pushLogin('phone');
+
         await checkUser();
         router.push('/');
     };
@@ -174,6 +178,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         await checkUser();
+        // Fire GA4 sign_up event
+        pushSignUp('phone');
         router.push('/dashboard');
     };
 
@@ -191,6 +197,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             console.error('Logout error', err);
         } finally {
             setUser(null);
+            // Fire GA4 logout event
+            pushLogout();
             router.push('/signin');
         }
     };

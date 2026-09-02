@@ -4,9 +4,19 @@ import BillingForm from "@/components/modules/cart/BillingForm";
 import CartItemRow from "@/components/modules/cart/CartItemRow";
 import { RootState } from "@/store";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { pushBeginCheckout } from "@/datalayer";
 
 const Page = () => {
     const cartItems = useSelector((state: RootState) => state.cart.items);
+
+    // Fire GA4 begin_checkout when the checkout page loads
+    useEffect(() => {
+        if (cartItems.length > 0) {
+            pushBeginCheckout(cartItems);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="flex flex-col lg:grid lg:grid-cols-7">

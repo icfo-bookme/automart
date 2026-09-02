@@ -6,15 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import contactUser from "@/services/contactUser";
 import { Label } from "@radix-ui/react-dropdown-menu";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { ContactTabs } from "./Tab";
+import { pushContactFormSubmit } from "@/datalayer";
 
 const ContactForm = ({ type }: { type: string }) => {
     const [state, formAction, isPending] = useActionState(contactUser, null);
+    const formRef = useRef<HTMLFormElement>(null);
+    const lastFormValues = useRef<{ name?: string; email?: string; type?: string }>({});
 
     useEffect(() => {
         if (state?.success) {
+            // Fire GA4 contact_form_submit (lead) event on success
+            pushContactFormSubmit(lastFormValues.current);
             toast.success("Contact form submitted!", {
                 description: state.message || "We'll get back to you soon.",
             });
@@ -27,7 +32,20 @@ const ContactForm = ({ type }: { type: string }) => {
     return (
         <div>
 
-            <form action={formAction}>
+            <form
+                ref={formRef}
+                action={formAction}
+                onSubmit={() => {
+                    const form = formRef.current;
+                    if (!form) return;
+                    const fd = new FormData(form);
+                    lastFormValues.current = {
+                        name: (fd.get("name") as string) || undefined,
+                        email: (fd.get("email") as string) || undefined,
+                        type: (fd.get("type") as string) || undefined,
+                    };
+                }}
+            >
                 <FieldGroup>
                     <div className="grid grid-cols-1  gap-4">
                         {/* Name */}
