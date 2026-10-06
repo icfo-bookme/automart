@@ -21,11 +21,13 @@ export default function InfiniteProductList({
   styleClass,
   title,
   sectionId,
+  categoryId,
 }: {
   sort?: string;
   styleClass?: string;
   title?: string;
   sectionId?: number;
+  categoryId?: number;
 }) {
   const [items, setItems] = useState<Item[]>([]);
   const [page, setPage] = useState(1);
@@ -39,7 +41,7 @@ export default function InfiniteProductList({
     setItems([]);
     setPage(1);
     setHasMore(true);
-  }, [sort, sectionId]);
+  }, [sort, sectionId, categoryId]);
 
   const fetchItems = useCallback(async () => {
     if (isFetchingRef.current || !hasMore) return;
@@ -52,6 +54,8 @@ export default function InfiniteProductList({
 
       if (sort === "newest") {
         url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/items?page=${page}`;
+      } else if (sort === "category") {
+        url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/items/category/${categoryId}?page=${page}`;
       } else if (sort === "section") {
         url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/sections/${sectionId}?page=${page}`;
       } else {
@@ -68,7 +72,7 @@ export default function InfiniteProductList({
         setHasMore(false);
       } else {
         setItems((prev) => {
-          // ✅ remove duplicate by id
+          //  remove duplicate by id
           const ids = new Set(prev.map((i) => i.id));
           const filtered = newItems.filter((i) => !ids.has(i.id));
           return [...prev, ...filtered];
@@ -85,9 +89,9 @@ export default function InfiniteProductList({
       setLoading(false);
       isFetchingRef.current = false;
     }
-  }, [page, hasMore, sort, sectionId]);
+  }, [page, hasMore, sort, sectionId, categoryId]);
 
-  // ✅ Intersection Observer only (no initial double fetch)
+  //  Intersection Observer only (no initial double fetch)
   useEffect(() => {
     if (!observerRef.current) return;
 
@@ -118,7 +122,7 @@ export default function InfiniteProductList({
 
           return (
             <div
-              key={item.id} // ✅ fixed key (no index)
+              key={item.id} //  fixed key (no index)
               className="group relative bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-200 flex flex-col h-full"
             >
               {/* Discount */}

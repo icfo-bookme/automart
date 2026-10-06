@@ -36,7 +36,7 @@ export default function CartSheet() {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      {/* ✅ SheetTrigger must have ONE child */}
+      {/*  SheetTrigger must have ONE child */}
       <SheetTrigger asChild>
         <div className="relative">
           {/* Desktop button */}

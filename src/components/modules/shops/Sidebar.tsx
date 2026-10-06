@@ -23,10 +23,6 @@ const Sidebar = () => {
         )
     }
 
-    const closeDropdown = () => {
-        setExpandedCategory(null)
-    }
-
     return (
         <div className="min-w-[280px]">
             <div className="bg-white border border-gray-200 shadow-xl p-4 rounded-md min-h-[400px]">
@@ -54,31 +50,33 @@ const Sidebar = () => {
                                         {category.name}
                                     </span>
 
-                                    {category.sub_categories?.length > 0 && (
                                         <ChevronDown
                                             size={18}
                                             className={`transition-transform duration-200 ${expandedCategory === category.id
-                                                    ? "rotate-180"
-                                                    : ""
+                                                ? "rotate-180"
+                                                : ""
                                                 }`}
                                         />
-                                    )}
                                 </div>
 
                                 <hr />
 
                                 {/* Subcategories */}
-                                {expandedCategory === category.id &&
-                                    category.sub_categories?.length > 0 && (
+                                {expandedCategory === category.id && (
                                         <div className="pl-4 mt-1">
-                                            {category.sub_categories.map(
+                                            <Link
+                                                href={`/category/${slugify(category.name)}/${category.id}`}
+                                                className="block pl-6 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+                                            >
+                                                All Products
+                                            </Link>
+                                            {category.sub_categories?.map(
                                                 (sub) => (
                                                     <Link
                                                         key={sub.id}
                                                         href={`/subcategory/${slugify(
                                                             sub.name
                                                         )}/${sub.id}`}
-                                                        onClick={closeDropdown}
                                                         className="block pl-6 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
                                                     >
                                                         {sub.name}

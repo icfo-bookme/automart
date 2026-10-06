@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useFetch } from "@/hooks/useFetch"
-import { Menu, ChevronDown, X, HousePlus } from "lucide-react"
+import { Menu, ChevronDown, X, HousePlus, ArrowUpRight, LayoutGrid } from "lucide-react"
 import { CategoryWithSub } from "@/types/categoryWithSub"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,10 +15,20 @@ import {
 import { slugify } from "@/utils/slugify"
 
 const BottomHeader = () => {
+  const pathname = usePathname()
+  const productLinkClass = (href: string, allProducts = false) =>
+    `mx-2 flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${pathname === href
+      ? allProducts
+        ? "font-semibold text-gray-900"
+        : "bg-red-100 font-semibold text-red-700"
+      : allProducts
+        ? "font-semibold text-gray-700 hover:text-gray-900"
+        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+    }`
   const { data: categoriesData } =
     useFetch<CategoryWithSub[]>("/categories-with-sub")
 
-  const [categories, setCategories] = useState<CategoryWithSub[]>([])
+  const categories = categoriesData || []
   const [expandedCategory, setExpandedCategory] = useState<number | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -30,10 +41,6 @@ const BottomHeader = () => {
     { label: "OFFER", href: "/offers" },
     { label: "CONTACT US", href: "/contact" },
   ]
-
-  useEffect(() => {
-    if (categoriesData) setCategories(categoriesData)
-  }, [categoriesData])
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50)
@@ -90,31 +97,46 @@ const BottomHeader = () => {
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="min-w-[220px] bg-white border shadow-xl p-2 rounded-md">
+              <DropdownMenuContent align="start" sideOffset={10} className="w-80 max-w-[calc(100vw-2rem)] max-h-[min(70dvh,var(--radix-dropdown-menu-content-available-height))] overflow-y-auto rounded-xl border-gray-200 bg-white p-2 shadow-xl">
+                <div className="mb-2 border-b border-gray-100 px-3 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Browse categories</p>
+                </div>
                 {categories.map((category) => (
                   <div key={category.id}>
-                    <div
-                      className="flex justify-between items-center cursor-pointer p-2 hover:bg-gray-50 rounded"
+                    <button
+                      type="button"
+                      aria-expanded={expandedCategory === category.id}
+                      className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${expandedCategory === category.id ? "bg-gray-100 text-gray-900" : "text-gray-700 hover:bg-gray-50"}`}
                       onClick={() => toggleCategory(category.id)}
                     >
                       <span className="font-semibold">{category.name}</span>
-                      {category.sub_categories?.length > 0 && (
                         <ChevronDown
                           size={16}
-                          className={`transition-transform ${expandedCategory === category.id
+                          className={`shrink-0 text-gray-400 transition-transform ${expandedCategory === category.id
                               ? "rotate-180"
                               : ""
                             }`}
                         />
-                      )}
-                    </div>
-                    <hr />
+                    </button>
+                    {expandedCategory === category.id && (
+                      <Link
+                        href={`/category/${slugify(category.name)}/${category.id}`}
+                        className={`${productLinkClass(`/category/${slugify(category.name)}/${category.id}`, true)} mt-1`}
+                        aria-current={pathname === `/category/${slugify(category.name)}/${category.id}` ? "page" : undefined}
+                        onClick={closeDropdown}
+                      >
+                        <LayoutGrid size={16} aria-hidden="true" />
+                        <span className="flex-1">All Products</span>
+                        <ArrowUpRight size={15} aria-hidden="true" />
+                      </Link>
+                    )}
                     {expandedCategory === category.id &&
                       category.sub_categories?.map((sub) => (
                         <Link
                           key={sub.id}
                           href={`/subcategory/${slugify(sub.name)}/${sub.id}`}
-                          className="block pl-6 py-1 text-gray-600 hover:text-red-600"
+                          className={productLinkClass(`/subcategory/${slugify(sub.name)}/${sub.id}`)}
+                          aria-current={pathname === `/subcategory/${slugify(sub.name)}/${sub.id}` ? "page" : undefined}
                           onClick={closeDropdown}
                         >
                           {sub.name}
@@ -151,6 +173,8 @@ const BottomHeader = () => {
               className="border border-gray-600"
               variant="ghost"
               size="icon"
+              aria-label={mobileMenuOpen ? "Close category menu" : "Open category menu"}
+              aria-expanded={mobileMenuOpen}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -160,37 +184,51 @@ const BottomHeader = () => {
           {mobileMenuOpen && (
             <div
               ref={mobileMenuRef}
-              className="absolute w-64 h-[82vh] overflow-auto top-full -left-6 bg-white shadow-lg border-t z-50"
+              className="absolute left-3 top-full z-50 w-80 max-w-[calc(100vw-1.5rem)] max-h-[75dvh] overflow-y-auto overscroll-contain rounded-xl border border-gray-200 bg-white p-2 shadow-xl"
             >
               <div>
-                <h3 className="font-bold text-lg mb-3 pt-4 px-2">
+                <h3 className="mb-2 border-b border-gray-100 px-3 py-3 text-xs font-semibold tracking-wider text-gray-400">
                   ALL CATEGORIES
                 </h3>
 
                 {categories.map((category) => (
-                  <div key={category.id} className="border-b">
+                  <div key={category.id}>
                     <button
+                      type="button"
+                      aria-expanded={expandedCategory === category.id}
                       onClick={() => toggleCategory(category.id)}
-                      className="flex justify-between w-full p-3 hover:bg-gray-50"
+                      className={`flex w-full items-center justify-between gap-3 rounded-lg p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${expandedCategory === category.id ? "bg-gray-100 text-gray-900" : "text-gray-700 hover:bg-gray-50"}`}
                     >
                       <span className="font-semibold">{category.name}</span>
-                      {category.sub_categories?.length > 0 && (
                         <ChevronDown
                           size={16}
-                          className={`transition-transform ${expandedCategory === category.id
+                          className={`shrink-0 text-gray-400 transition-transform ${expandedCategory === category.id
                               ? "rotate-180"
                               : ""
                             }`}
                         />
-                      )}
                     </button>
+
+                    {expandedCategory === category.id && (
+                      <Link
+                        href={`/category/${slugify(category.name)}/${category.id}`}
+                        className={`${productLinkClass(`/category/${slugify(category.name)}/${category.id}`, true)} mt-1`}
+                        aria-current={pathname === `/category/${slugify(category.name)}/${category.id}` ? "page" : undefined}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <LayoutGrid size={16} aria-hidden="true" />
+                        <span className="flex-1">All Products</span>
+                        <ArrowUpRight size={15} aria-hidden="true" />
+                      </Link>
+                    )}
 
                     {expandedCategory === category.id &&
                       category.sub_categories?.map((sub) => (
                         <Link
                           key={sub.id}
                           href={`/subcategory/${slugify(sub.name)}/${sub.id}`}
-                          className="block pl-6 py-2 text-gray-600 hover:text-red-600"
+                          className={productLinkClass(`/subcategory/${slugify(sub.name)}/${sub.id}`)}
+                          aria-current={pathname === `/subcategory/${slugify(sub.name)}/${sub.id}` ? "page" : undefined}
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           {sub.name}
@@ -199,7 +237,7 @@ const BottomHeader = () => {
                   </div>
                 ))}
 
-                <nav className="mt-4">
+                <nav className="mt-3 border-t border-gray-100 pt-2">
                   {navItems.map((item) => (
                     <Link
                       key={item.label}

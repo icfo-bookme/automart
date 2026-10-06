@@ -1,6 +1,6 @@
 # Data Layer (GTM) Implementation Plan — Automart
 
-> ✅ **Status:** Implementation done — `src/datalayer/` folder + `index.ts` + আলাদা আলাদা সব ফাইল তৈরি হয়ে গেছে
+>  **Status:** Implementation done — `src/datalayer/` folder + `index.ts` + আলাদা আলাদা সব ফাইল তৈরি হয়ে গেছে
 > (events, utils, pageEvents, productEvents, cartEvents, checkoutEvents, authEvents, searchEvents, contactEvents)।
 > এখন পর্যন্ত দরকার: (১) এই ফাংশনগুলো component-এ wire করা, (২) নিচের guideline অনুযায়ী GTM-এ tag/trigger/variable বানানো।
 
@@ -152,7 +152,7 @@ pushPurchase(order, items);
 
 ## 8. Next Step
 
-1. ✅ এই documentation-টা পড়ে দেখুন — বিশেষ করে **section 3** (event catalog) ও **section 5** (payload structure)
+1.  এই documentation-টা পড়ে দেখুন — বিশেষ করে **section 3** (event catalog) ও **section 5** (payload structure)
 2. কোনো event যোগ/বদল করতে চাইলে জানান — আমি doc update করে দেব
 3. **Approve করলে** — আমি `src/datalayer/` folder + `index.ts` + আলাদা আলাদা সব ফাইল implement করব
 4. তারপর apni GTM-এ tag/trigger/variable তৈরি করবেন (section 6 অনুযায়ী)
