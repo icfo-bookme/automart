@@ -21,13 +21,13 @@ const slides = [
         alt: "Automart.com.bd - Premium car accessories and motorcycle parts online store in Bangladesh",
         image: "/slider/slider0.png",
     },
-    {
-        id: 5,
-        title: "Interior Accessories",
-        subtitle: "Seat Cover, Steering Cover",
-        alt:"Professional car care products including 3M wax and Kangaroo foam cleaners for detailing in Bangladesh",
-        image: "/slider/slider11.png",
-    },
+    // {
+    //     id: 5,
+    //     title: "Interior Accessories",
+    //     subtitle: "Seat Cover, Steering Cover",
+    //     alt:"Professional car care products including 3M wax and Kangaroo foam cleaners for detailing in Bangladesh",
+    //     image: "/slider/slider11.png",
+    // },
     {
         id: 2,
         title: "Car Floor Mats",
